@@ -27,6 +27,7 @@
   --font-ui: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --font-display: "Fraunces", "Iowan Old Style", Georgia, "Times New Roman", serif;
   --text-scale:1;
+  --content-max:1440px;
   /* validated categorical chart palette (dataviz skill reference instance) */
   --cat-1:#2a78d6; --cat-1-rgb:42,120,214;  --cat-2:#eb6834; --cat-2-rgb:235,104,52;
   --cat-3:#1baf7a; --cat-3-rgb:27,175,122;  --cat-4:#eda100; --cat-4-rgb:237,161,0;
@@ -108,8 +109,8 @@ a{color:inherit;}
 @media (max-width:620px){ #demo-top-banner{font-size:11.5px; height:36px;} }
 
 /* ===================== LAYOUT SHELL ===================== */
-#shell{display:grid; grid-template-columns:230px 1fr; min-height:calc(100vh - 40px); position:relative; z-index:1;}
-@media (max-width:860px){ #shell{grid-template-columns:1fr;} }
+#shell{display:grid; grid-template-columns:230px minmax(0,1fr); min-height:calc(100vh - 40px); position:relative; z-index:1;}
+@media (max-width:860px){ #shell{grid-template-columns:minmax(0,1fr);} }
 
 #sidebar{
   background:var(--card); border-right:1px solid var(--border); padding:20px 14px;
@@ -130,11 +131,24 @@ a{color:inherit;}
 .navitem .ic{width:18px; text-align:center;}
 
 #topbar{
-  display:flex; align-items:center; gap:10px; padding:14px 22px; border-bottom:1px solid var(--border);
+  border-bottom:1px solid var(--border);
   background:var(--card); position:sticky; top:40px; z-index:20;
 }
+.topbar-inner{
+  display:flex; align-items:center; gap:10px; padding:14px 24px;
+  width:100%; max-width:var(--content-max); margin-inline:auto;
+}
+@media (max-width:860px){ .topbar-inner{padding:14px 14px;} }
+@media (max-width:620px){
+  .topbar-inner{padding:10px 14px; gap:8px; flex-wrap:wrap;}
+  .topbar-inner > div:first-child{min-width:0; flex:1 1 0;}
+  .topbar-inner > .spacer{display:none;}
+  .topbar-inner > .btn{display:none;}
+}
+/* very narrow phones: drop the date line, keep the greeting */
+@media (max-width:374px){ .topbar-inner > div:first-child > div:first-child{display:none;} }
 @media (max-width:620px){ #topbar{top:36px;} }
-#topbar .spacer{flex:1;}
+.topbar-inner .spacer{flex:1;}
 .iconbtn{
   background:var(--bg-2); border:1px solid var(--border); border-radius:10px; width:38px; height:38px;
   display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--text);
@@ -157,16 +171,16 @@ a{color:inherit;}
 .pill-toggle button{border:none; background:transparent; padding:6px 13px; border-radius:999px; font-size:12.5px; font-weight:600; color:var(--text-muted); transition:background .15s, color .15s;}
 .pill-toggle button.active{background:linear-gradient(135deg,var(--brand),var(--accent)); color:#fff; box-shadow:0 4px 12px -2px rgba(var(--brand-rgb),.5);}
 
-#main{padding:22px 24px 90px; max-width:1180px;}
+#main{padding:22px 24px 90px; width:100%; max-width:var(--content-max); margin-inline:auto;}
 @media (max-width:860px){ #main{padding:16px 14px 90px;} }
 .overline{font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-muted); margin-bottom:2px;}
 .screen-title{font-size:26px; margin-bottom:16px;}
-.grid-23{display:grid; grid-template-columns:2fr 1fr; gap:18px;}
-@media (max-width:860px){ .grid-23{grid-template-columns:1fr;} }
+.grid-23{display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr); gap:18px;}
+@media (max-width:860px){ .grid-23{grid-template-columns:minmax(0,1fr);} }
 .row{display:flex; gap:14px; flex-wrap:wrap;}
-.col{display:flex; flex-direction:column; gap:14px;}
+.col{display:flex; flex-direction:column; gap:14px; min-width:0;}
 
-.card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius-card); padding:18px 20px;
+.card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius-card); padding:18px 20px; min-width:0;
   box-shadow:var(--shadow-sm); transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;}
 .card:hover{ transform:translateY(-3px); box-shadow:var(--shadow-md); border-color:rgba(var(--brand-rgb),.3); }
 .card.soft{background:var(--card-soft);}
@@ -223,6 +237,7 @@ label{font-size:12.5px; color:var(--text-muted); display:block; margin-bottom:4p
 .list-row .amt{font-weight:700; font-size:14.5px; white-space:nowrap;}
 .list-row .amt.out{color:var(--text);} .list-row .amt.in{color:var(--positive);}
 .list-row .iconbtn{width:30px;height:30px;font-size:13px;}
+@media (max-width:620px){ .list-row{flex-wrap:wrap; gap:8px;} }
 
 table.datatable{width:100%; border-collapse:collapse; font-size:13px;}
 table.datatable th, table.datatable td{text-align:left; padding:7px 8px; border-bottom:1px solid var(--border);}
@@ -1490,6 +1505,7 @@ function renderTabbar(){
 function renderTopbar(){
   const d = new Intl.DateTimeFormat(LOCALE_MAP[state.settings.locale]||'en-US',{weekday:'long', day:'numeric', month:'long'}).format(new Date());
   return `
+    <div class="topbar-inner">
     <div><div style="font-size:12.5px;color:var(--text-muted)">${esc(d)}</div><div style="font-weight:700">${esc(greeting())}</div></div>
     <div class="spacer"></div>
     <div class="pill-toggle" role="group" aria-label="Focus or full mode">
@@ -1500,6 +1516,7 @@ function renderTopbar(){
     <button class="iconbtn" data-action="toggle-mode" title="${esc(t('mode'))}">${state.settings.mode==='dark'?'☀️':'🌙'}</button>
     <button class="btn ghost" data-action="open-check-money">${esc(t('check_my_money'))}</button>
     <button class="btn primary" data-action="open-add-spending">${esc(t('add_spending'))}</button>
+    </div>
   `;
 }
 
